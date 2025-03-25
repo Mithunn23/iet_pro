@@ -1,0 +1,47 @@
+`timescale 1ns / 1ps
+
+module pwm_tb;
+    
+    // Testbench signals
+    reg clk;
+    reg rst;
+    reg [3:0] duty_cycle;
+    wire pwm_out;
+    
+    // Instantiate the PWM module
+    pwm uut (
+        .clk(clk),
+        .rst(rst),
+        .duty_cycle(duty_cycle),
+        .pwm_out(pwm_out)
+    );
+    
+    // Clock generation (10 ns period => 100 MHz frequency)
+    always #5 clk = ~clk;
+    
+    initial begin
+        // Initialize signals
+        clk = 0;
+        rst = 1;
+        duty_cycle = 4'b0000;
+        
+        // Reset sequence
+        #20 rst = 0;
+        
+        // Test different duty cycles
+        #20 duty_cycle = 4'b0100;  // 25% duty cycle
+        #200 duty_cycle = 4'b1000;  // 50% duty cycle
+        #200 duty_cycle = 4'b1100;  // 75% duty cycle
+        #200 duty_cycle = 4'b1111;  // 100% duty cycle
+        #200 duty_cycle = 4'b0000;  // 0% duty cycle
+        
+        // End simulation
+        #50 $finish;
+    end
+    
+    // Monitor outputs
+    initial begin
+        $monitor("Time=%0t | Duty Cycle=%b | PWM Out=%b", $time, duty_cycle, pwm_out);
+    end
+    
+endmodule
